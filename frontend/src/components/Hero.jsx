@@ -1,11 +1,20 @@
 const Hero = () => {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-primary-50 to-accent-50 dark:from-dark-primary dark:to-dark-secondary">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-5 dark:opacity-10">
-        <div className="absolute inset-0" style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23FFB800' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-        }} />
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-accent-50 via-primary-50 to-accent-100 dark:from-dark-primary dark:via-dark-secondary dark:to-dark-primary">
+      {/* Glassmorphism Background Elements */}
+      <div className="absolute inset-0">
+        {/* Floating Glass Orbs */}
+        <div className="absolute top-20 left-10 w-32 h-32 glass-teal rounded-full animate-float opacity-30"></div>
+        <div className="absolute top-40 right-20 w-24 h-24 glass-teal rounded-full animate-float opacity-20" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute bottom-32 left-1/4 w-40 h-40 glass-teal rounded-full animate-float opacity-25" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute bottom-20 right-10 w-20 h-20 glass-teal rounded-full animate-float opacity-30" style={{ animationDelay: '0.5s' }}></div>
+        
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-10 dark:opacity-20">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2314B8A6' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          }} />
+        </div>
       </div>
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
@@ -13,7 +22,7 @@ const Hero = () => {
           {/* Left Content */}
           <div className="text-center lg:text-left">
             {/* Badge */}
-            <div className="inline-flex items-center px-4 py-2 rounded-full bg-accent-100 dark:bg-accent-900/30 text-accent-700 dark:text-accent-300 text-sm font-medium mb-6 animate-slide-down">
+            <div className="inline-flex items-center px-4 py-2 rounded-full glass-teal text-accent-700 dark:text-accent-300 text-sm font-medium mb-6 animate-fade-in-up">
               <span className="mr-2">🎯</span>
               Join 10,000+ Students
               <span className="ml-2">✅</span>
@@ -67,7 +76,7 @@ const Hero = () => {
           <div className="relative animate-float">
             <div className="relative max-w-md mx-auto lg:max-w-lg">
               {/* Main Illustration Container */}
-              <div className="relative bg-white dark:bg-dark-card rounded-2xl shadow-2xl p-8 border border-primary-200 dark:border-dark-border">
+              <div className="relative glass-hero rounded-2xl p-8 animate-scale-in">
                 {/* Success Steps Illustration */}
                 <div className="space-y-6">
                   {/* Step 1 */}

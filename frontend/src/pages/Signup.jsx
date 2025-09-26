@@ -100,7 +100,7 @@ export default function Signup() {
         {/* Header */}
         <div className="text-center">
           <Link to="/" className="inline-flex items-center space-x-2 mb-6">
-            <div className="w-10 h-10 bg-gradient-to-br from-accent-500 to-accent-600 rounded-lg flex items-center justify-center">
+            <div className="w-10 h-10 bg-gradient-to-br from-vibrant-purple-500 to-vibrant-orange-500 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-lg">A</span>
             </div>
             <span className="text-2xl font-bold text-primary-900 dark:text-dark-text-primary">Aptiprep</span>

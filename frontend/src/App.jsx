@@ -5,6 +5,7 @@ import HowItWorks from './components/HowItWorks'
 import FeaturedCourses from './components/FeaturedCourses'
 import Testimonials from './components/Testimonials'
 import Footer from './components/Footer'
+import ScrollToTop from './components/ScrollToTop'
 import { Routes, Route } from 'react-router-dom'
 import Courses from './pages/Courses.jsx'
 import Course from './pages/Course.jsx'
@@ -32,6 +33,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-dark-primary">
+      <ScrollToTop />
       <Header />
       <main>
         <Routes>
