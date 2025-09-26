@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- Primary Meta Tags -->
+    <title>Aptiprep - Master Aptitude Tests for Your Dream Career</title>
+    <meta name="title" content="Aptiprep - Master Aptitude Tests for Your Dream Career" />
+    <meta name="description" content="Level up your learning with AI-powered adaptive practice, personalized study paths, and expert guidance. Join 10,000+ students who achieved success with Aptiprep." />
+    <meta name="keywords" content="aptitude test, placement preparation, CAT preparation, quantitative aptitude, logical reasoning, data interpretation, mock tests" />
+    <meta name="author" content="Aptiprep" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://aptiprep.co.in/" />
+    <meta property="og:title" content="Aptiprep - Master Aptitude Tests for Your Dream Career" />
+    <meta property="og:description" content="Level up your learning with AI-powered adaptive practice, personalized study paths, and expert guidance." />
+    <meta property="og:image" content="/og-image.jpg" />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://aptiprep.co.in/" />
+    <meta property="twitter:title" content="Aptiprep - Master Aptitude Tests for Your Dream Career" />
+    <meta property="twitter:description" content="Level up your learning with AI-powered adaptive practice, personalized study paths, and expert guidance." />
+    <meta property="twitter:image" content="/og-image.jpg" />
+    
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#FFB800" />
+    <meta name="msapplication-TileColor" content="#FFB800" />
+    
+    <!-- Preconnect to Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    
+    <!-- Prevent FOUC (Flash of Unstyled Content) -->
+    <style>
+      /* Minimal critical CSS to prevent layout shift */
+      body { 
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        margin: 0;
+        background-color: #ffffff;
+      }
+      
+      /* Dark mode detection */
+      @media (prefers-color-scheme: dark) {
+        body { 
+          background-color: #0D1117;
+          color: #F0F6FC;
+        }
+      }
+      
+      /* Loading spinner */
+      .loading-spinner {
+        display: inline-block;
+        width: 40px;
+        height: 40px;
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #FFB800;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      
+      /* Hide loading when app loads */
+      .app-loaded .loading-container {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- App Root -->
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+    
+    <!-- Remove loading screen when app loads -->
+    <script>
+      (function() {
+        const hideLoader = () => {
+          try {
+            document.body.classList.add('app-loaded');
+            const el = document.querySelector('.loading-container');
+            if (el) el.style.display = 'none';
+          } catch {}
+        };
+
+        // Standard onload
+        window.addEventListener('load', hideLoader);
+        // Also hide on DOMContentLoaded (earlier than load)
+        document.addEventListener('DOMContentLoaded', hideLoader);
+        // Fallback timeout in case neither event fires due to a runtime error
+        setTimeout(hideLoader, 3000);
+      })();
+    </script>
+  </body>
+</html>
