@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../config/firebase';
-import YouTubePlayer from '../components/YouTubePlayer';
+import VideoPlayerCard from '../components/VideoPlayerCard';
+import YouTubeCustomPlayer from '../components/YouTubeCustomPlayer';
 import CustomVideoPlayer from '../components/CustomVideoPlayer';
 
 const CONTENT_TYPES = [
@@ -200,101 +201,108 @@ export default function LearningContent() {
               const contentUrl = item.contentUrl || item.fileUrl;
 
               return (
-                <div key={item.id} className="bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition-shadow">
-                  {/* Content Preview - All videos use custom player */}
-                  {videoId ? (
-                    <CustomVideoPlayer
-                      src={getYouTubeEmbedUrl(videoId)}
-                      title={item.title}
-                      className="w-full"
-                    />
-                  ) : item.fileUrl && item.fileType?.startsWith('video/') ? (
-                    <CustomVideoPlayer
+                <div key={item.id} className="bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition-shadow overflow-hidden">
+                  {/* Content Preview - Prefer uploaded MP4s; do NOT embed YouTube */}
+                  {item.fileUrl && item.fileType?.startsWith('video/') ? (
+                    <VideoPlayerCard
                       src={item.fileUrl}
                       title={item.title}
-                      className="w-full"
+                      description={item.description}
+                      tags={item.tags}
+                      notes={item.notes}
+                      className="rounded-none shadow-none"
+                    />
+                  ) : videoId ? (
+                    <YouTubeCustomPlayer
+                      videoId={videoId}
+                      title={item.title}
+                      className="rounded-none shadow-none"
                     />
                   ) : (
-                    <div className="aspect-video bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900 dark:to-purple-900 rounded-t-lg flex items-center justify-center">
-                      <div className="text-6xl">{getContentIcon(item.contentType)}</div>
-                    </div>
-                  )}
-
-                  <div className="p-6">
-                    {/* Content Type Badge */}
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs rounded-full">
-                        {CONTENT_TYPES.find(type => type.value === item.contentType)?.label || item.contentType}
-                      </span>
-                    </div>
-
-                    {/* Title */}
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                      {item.title}
-                    </h3>
-
-                    {/* Description */}
-                    <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-3">
-                      {item.description}
-                    </p>
-
-                    {/* Tags */}
-                    <div className="flex flex-wrap gap-1 mb-4">
-                      {item.tags?.map(tag => (
-                        <span
-                          key={tag}
-                          className="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs rounded-full"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-
-                    {/* Notes */}
-                    {item.notes && (
-                      <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                        <p className="text-sm text-gray-700 dark:text-gray-300">
-                          📝 {item.notes}
-                        </p>
+                    <>
+                      <div className="aspect-video bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900 dark:to-purple-900 flex items-center justify-center">
+                        <div className="text-6xl">{getContentIcon(item.contentType)}</div>
                       </div>
-                    )}
 
-                    {/* Action Buttons */}
-                    <div className="space-y-2">
-                      {contentUrl && contentUrl !== '#' && !videoId && !item.fileType?.startsWith('video/') && (
-                        <a
-                          href={contentUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="w-full px-4 py-2 text-center rounded-lg text-sm font-medium transition-colors bg-blue-600 text-white hover:bg-blue-700"
-                        >
-                          {item.contentType === 'document' ? '📄 View Document' :
-                           item.contentType === 'image' ? '🖼️ View Image' :
-                           '🔗 Open Link'}
-                        </a>
-                      )}
-
-                      {(videoId || item.fileType?.startsWith('video/')) && (
-                        <button className="w-full px-4 py-2 text-center rounded-lg text-sm font-medium bg-green-600 text-white cursor-default">
-                          ▶️ Video Player Above
-                        </button>
-                      )}
-
-                      {/* Google Drive specific handling */}
-                      {isGoogleDriveUrl(contentUrl) && !videoId && !item.fileType?.startsWith('video/') && (
-                        <div className="text-xs text-gray-500 dark:text-gray-400">
-                          <p>💡 Tip: For Google Drive links, make sure sharing is set to "Anyone with the link can view"</p>
+                      <div className="p-6">
+                        {/* Content Type Badge */}
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs rounded-full">
+                            {CONTENT_TYPES.find(type => type.value === item.contentType)?.label || item.contentType}
+                          </span>
                         </div>
-                      )}
-                    </div>
 
-                    {/* Created Date */}
-                    <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
-                        Added {item.createdAt?.toDate?.()?.toLocaleDateString() || 'Recently'}
-                      </p>
-                    </div>
-                  </div>
+                        {/* Title */}
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                          {item.title}
+                        </h3>
+
+                        {/* Description */}
+                        <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-3">
+                          {item.description}
+                        </p>
+
+                        {/* Tags */}
+                        <div className="flex flex-wrap gap-1 mb-4">
+                          {item.tags?.map(tag => (
+                            <span
+                              key={tag}
+                              className="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs rounded-full"
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+
+                        {/* Notes */}
+                        {item.notes && (
+                          <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                            <p className="text-sm text-gray-700 dark:text-gray-300">
+                              📝 {item.notes}
+                            </p>
+                          </div>
+                        )}
+                        {/* Action Buttons */}
+                        <div className="space-y-2">
+                          {contentUrl && !videoId && !item.fileType?.startsWith('video/') && (
+                            <a
+                              href={contentUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="w-full px-4 py-2 text-center rounded-lg text-sm font-medium transition-colors bg-blue-600 text-white hover:bg-blue-700 block"
+                            >
+                              {item.contentType === 'document' ? '📄 View Document' :
+                               item.contentType === 'image' ? '🖼️ View Image' :
+                               '🔗 Open Link'}
+                            </a>
+                          )}
+                          {videoId && !item.fileUrl && (
+                            <div className="aspect-video bg-black flex items-center justify-center">
+                              <img
+                                src={`https://img.youtube.com/vi/${videoId}/hqdefault.jpg`}
+                                alt={item.title}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                          )}
+
+                          {/* Google Drive specific handling */}
+                          {isGoogleDriveUrl(contentUrl) && !videoId && !item.fileType?.startsWith('video/') && (
+                            <div className="text-xs text-gray-500 dark:text-gray-400">
+                              <p>💡 Tip: For Google Drive links, make sure sharing is set to "Anyone with the link can view"</p>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Created Date */}
+                        <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                            Added {item.createdAt?.toDate?.()?.toLocaleDateString() || 'Recently'}
+                          </p>
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
               );
             })}
