@@ -1,0 +1,102 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Users can read/write their own data
+    match /users/{userId} {
+      // Users can read/write their own profile; admins can read/write any
+      allow read, write: if request.auth != null && (
+        request.auth.uid == userId || isAdmin()
+      );
+    }
+    
+    // User progress is private to user
+    match /userProgress/{userId} {
+      // Users can access their own progress; admins can read for oversight
+      allow read: if request.auth != null && (
+        request.auth.uid == userId || isAdmin()
+      );
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Public content - anyone can read, only admins can write
+    match /companies/{companyId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    match /roadmaps/{roadmapId} {
+      allow read: if resource.data.isPublished == true;
+      allow write: if isAdmin() || isInstructor();
+    }
+    
+    match /playlists/{playlistId} {
+      // Public or enrolled users can read; admins can read all
+      allow read: if resource.data.isPublic == true || 
+                     (request.auth != null && isEnrolled(playlistId)) ||
+                     isAdmin();
+      allow write: if isAdmin() || isInstructor();
+    }
+    
+    match /videos/{videoId} {
+      // Active videos are readable; admins can read all
+      allow read: if resource.data.isActive == true || isAdmin();
+      allow write: if isAdmin() || isInstructor();
+    }
+    
+    match /mockTests/{testId} {
+      // Authenticated users can read active tests; admins can read all
+      allow read: if (resource.data.isActive == true && request.auth != null) || isAdmin();
+      allow write: if isAdmin();
+    }
+    
+    match /testAttempts/{attemptId} {
+      // Users can access their own attempts; admins can read all attempts
+      allow read: if request.auth != null && (
+        resource.data.userId == request.auth.uid || isAdmin()
+      );
+      allow write: if request.auth != null && resource.data.userId == request.auth.uid;
+    }
+    
+    // Admin-only content
+    match /adminContent/{contentId} {
+      allow read, write: if isAdmin();
+    }
+    
+    // Analytics data - read-only for users, write for system
+    match /analytics/{docId} {
+      allow read: if request.auth != null;
+      allow write: if isAdmin();
+    }
+    
+    // Notifications
+    match /notifications/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // LMS Content - Learning materials
+    match /lmsContent/{contentId} {
+      // Authenticated users can read all content (filtering done in client)
+      // Only admins can create/modify content
+      allow read: if request.auth != null;
+      allow write: if isAdmin();
+    }
+    
+    // Helper functions
+    function isAdmin() {
+      return request.auth != null && 
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    
+    function isInstructor() {
+      return request.auth != null && 
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'instructor'];
+    }
+    
+    function isEnrolled(playlistId) {
+      return request.auth != null &&
+             exists(/databases/$(database)/documents/userProgress/$(request.auth.uid)) &&
+             playlistId in get(/databases/$(database)/documents/userProgress/$(request.auth.uid)).data.playlists;
+    }
+  }
+}

@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
+import { useAuth } from '../contexts/AuthContext'
 
 export default function Login() {
   const [formData, setFormData] = useState({
@@ -9,6 +10,13 @@ export default function Login() {
   })
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState('')
+  
+  const { login, signInWithGoogle, signInWithFacebook } = useAuth()
+  const navigate = useNavigate()
+  const location = useLocation()
+  
+  const from = location.state?.from?.pathname || '/dashboard'
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target
@@ -21,13 +29,47 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setIsLoading(true)
+    setError('')
     
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      await login(formData.email, formData.password)
+      navigate(from, { replace: true })
+    } catch (error) {
+      setError('Failed to sign in. Please check your credentials.')
+      console.error('Login error:', error)
+    } finally {
       setIsLoading(false)
-      // Redirect to dashboard on success
-      window.location.href = '/dashboard'
-    }, 1500)
+    }
+  }
+  
+  const handleGoogleSignIn = async () => {
+    setIsLoading(true)
+    setError('')
+    
+    try {
+      await signInWithGoogle()
+      navigate(from, { replace: true })
+    } catch (error) {
+      setError('Failed to sign in with Google.')
+      console.error('Google sign in error:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+  
+  const handleFacebookSignIn = async () => {
+    setIsLoading(true)
+    setError('')
+    
+    try {
+      await signInWithFacebook()
+      navigate(from, { replace: true })
+    } catch (error) {
+      setError('Failed to sign in with Facebook.')
+      console.error('Facebook sign in error:', error)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -51,6 +93,11 @@ export default function Login() {
 
         {/* Login Form */}
         <div className="bg-white dark:bg-dark-card rounded-lg shadow-lg border border-primary-200 dark:border-dark-border p-8">
+          {error && (
+            <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+              {error}
+            </div>
+          )}
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Email Field */}
             <div>
@@ -151,11 +198,21 @@ export default function Login() {
 
           {/* Social Login */}
           <div className="mt-6 grid grid-cols-2 gap-3">
-            <button className="btn-outline flex items-center justify-center">
+            <button 
+              type="button"
+              onClick={handleGoogleSignIn}
+              disabled={isLoading}
+              className="btn-outline flex items-center justify-center disabled:opacity-50"
+            >
               <span className="mr-2">🔍</span>
               Google
             </button>
-            <button className="btn-outline flex items-center justify-center">
+            <button 
+              type="button"
+              onClick={handleFacebookSignIn}
+              disabled={isLoading}
+              className="btn-outline flex items-center justify-center disabled:opacity-50"
+            >
               <span className="mr-2">📘</span>
               Facebook
             </button>

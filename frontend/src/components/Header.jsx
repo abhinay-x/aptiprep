@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import { NavLink, Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import ThemeToggle from './ThemeToggle';
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const { currentUser, userProfile, logout, isAdmin } = useAuth();
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -53,12 +56,73 @@ const Header = () => {
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center space-x-3">
             <ThemeToggle />
-            <Link to="/login" className="btn-outline btn-sm">
-              Login
-            </Link>
-            <Link to="/signup" className="btn-primary btn-sm">
-              Get Started
-            </Link>
+            {currentUser ? (
+              <div className="relative">
+                <button
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                  className="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
+                >
+                  <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                    <span className="text-white text-sm font-medium">
+                      {userProfile?.displayName?.charAt(0) || currentUser.email?.charAt(0) || 'U'}
+                    </span>
+                  </div>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    {userProfile?.displayName || 'User'}
+                  </span>
+                  <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                
+                {showUserMenu && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-50">
+                    <Link
+                      to="/dashboard"
+                      className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                      onClick={() => setShowUserMenu(false)}
+                    >
+                      Dashboard
+                    </Link>
+                    <Link
+                      to="/analytics"
+                      className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                      onClick={() => setShowUserMenu(false)}
+                    >
+                      Analytics
+                    </Link>
+                    {isAdmin() && (
+                      <Link
+                        to="/admin/dashboard"
+                        className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                        onClick={() => setShowUserMenu(false)}
+                      >
+                        Admin Dashboard
+                      </Link>
+                    )}
+                    <hr className="my-1" />
+                    <button
+                      onClick={() => {
+                        logout();
+                        setShowUserMenu(false);
+                      }}
+                      className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    >
+                      Sign out
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <>
+                <Link to="/login" className="btn-outline btn-sm">
+                  Login
+                </Link>
+                <Link to="/signup" className="btn-primary btn-sm">
+                  Get Started
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -114,14 +178,75 @@ const Header = () => {
             </NavLink>
           ))}
           <div className="pt-4 pb-3 border-t border-primary-200 dark:border-dark-border">
-            <div className="flex items-center px-3 space-x-3">
-              <Link to="/login" className="btn-outline btn-sm flex-1">
-                Login
-              </Link>
-              <Link to="/signup" className="btn-primary btn-sm flex-1">
-                Get Started
-              </Link>
-            </div>
+            {currentUser ? (
+              <div className="px-3 space-y-3">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                    <span className="text-white text-sm font-medium">
+                      {userProfile?.displayName?.charAt(0) || currentUser.email?.charAt(0) || 'U'}
+                    </span>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                      {userProfile?.displayName || 'User'}
+                    </p>
+                    <Link to="/courses" className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-3 py-2 rounded-md text-sm font-medium" onClick={() => setIsMobileMenuOpen(false)}>
+                      Courses
+                    </Link>
+                    <Link to="/learning" className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-3 py-2 rounded-md text-sm font-medium" onClick={() => setIsMobileMenuOpen(false)}>
+                      Learning
+                    </Link>
+                    <Link to="/practice" className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-3 py-2 rounded-md text-sm font-medium" onClick={() => setIsMobileMenuOpen(false)}>
+                      Practice
+                    </Link>
+                    <Link to="/tests" className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-3 py-2 rounded-md text-sm font-medium" onClick={() => setIsMobileMenuOpen(false)}>
+                      Tests
+                    </Link>
+                  </div>
+                  <Link
+                    to="/dashboard"
+                    className="block px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Dashboard
+                  </Link>
+                  <Link
+                    to="/analytics"
+                    className="block px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Analytics
+                  </Link>
+                  {isAdmin() && (
+                    <Link
+                      to="/admin/dashboard"
+                      className="block px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      Admin Dashboard
+                    </Link>
+                  )}
+                  <button
+                    onClick={() => {
+                      logout();
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="block w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                  >
+                    Sign out
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center px-3 space-x-3">
+                <Link to="/login" className="btn-outline btn-sm flex-1">
+                  Login
+                </Link>
+                <Link to="/signup" className="btn-primary btn-sm flex-1">
+                  Get Started
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </div>

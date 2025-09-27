@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { useAuth } from '../contexts/AuthContext'
 
 export default function Signup() {
   const [formData, setFormData] = useState({
@@ -15,6 +16,9 @@ export default function Signup() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [errors, setErrors] = useState({})
+  
+  const { signup, signInWithGoogle, signInWithFacebook } = useAuth()
+  const navigate = useNavigate()
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target
@@ -74,12 +78,49 @@ export default function Signup() {
     
     setIsLoading(true)
     
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      await signup(formData.email, formData.password, {
+        firstName: formData.firstName,
+        lastName: formData.lastName
+      })
+      // After successful signup, user is automatically logged in
+      navigate('/dashboard')
+    } catch (error) {
+      setErrors({ submit: 'Failed to create account. Please try again.' })
+      console.error('Signup error:', error)
+    } finally {
       setIsLoading(false)
-      // Redirect to dashboard on success
-      window.location.href = '/dashboard'
-    }, 2000)
+    }
+  }
+  
+  const handleGoogleSignUp = async () => {
+    setIsLoading(true)
+    setErrors({})
+    
+    try {
+      await signInWithGoogle()
+      navigate('/dashboard')
+    } catch (error) {
+      setErrors({ submit: 'Failed to sign up with Google.' })
+      console.error('Google sign up error:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+  
+  const handleFacebookSignUp = async () => {
+    setIsLoading(true)
+    setErrors({})
+    
+    try {
+      await signInWithFacebook()
+      navigate('/dashboard')
+    } catch (error) {
+      setErrors({ submit: 'Failed to sign up with Facebook.' })
+      console.error('Facebook sign up error:', error)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const getPasswordStrength = (password) => {
@@ -115,6 +156,11 @@ export default function Signup() {
 
         {/* Signup Form */}
         <div className="bg-white dark:bg-dark-card rounded-lg shadow-lg border border-primary-200 dark:border-dark-border p-8">
+          {errors.submit && (
+            <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+              {errors.submit}
+            </div>
+          )}
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Name Fields */}
             <div className="grid grid-cols-2 gap-4">
@@ -327,11 +373,21 @@ export default function Signup() {
 
           {/* Social Signup */}
           <div className="mt-6 grid grid-cols-2 gap-3">
-            <button className="btn-outline flex items-center justify-center">
+            <button 
+              type="button"
+              onClick={handleGoogleSignUp}
+              disabled={isLoading}
+              className="btn-outline flex items-center justify-center disabled:opacity-50"
+            >
               <span className="mr-2">🔍</span>
               Google
             </button>
-            <button className="btn-outline flex items-center justify-center">
+            <button 
+              type="button"
+              onClick={handleFacebookSignUp}
+              disabled={isLoading}
+              className="btn-outline flex items-center justify-center disabled:opacity-50"
+            >
               <span className="mr-2">📘</span>
               Facebook
             </button>
