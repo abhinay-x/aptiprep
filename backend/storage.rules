@@ -1,41 +1,12 @@
 rules_version = '2';
+
+// Craft rules based on data in your Firestore database
+// allow write: if firestore.get(
+//    /databases/(default)/documents/users/$(request.auth.uid)).data.isAdmin;
 service firebase.storage {
   match /b/{bucket}/o {
-    
-    // User profile pictures
-    match /users/{userId}/profile/{fileName} {
-      allow read: if true;
-      allow write: if request.auth != null && request.auth.uid == userId
-                   && request.resource.size < 5 * 1024 * 1024 // 5MB limit
-                   && request.resource.contentType.matches('image/.*');
-    }
-    
-    // Course materials (PDFs, notes)
-    match /course-materials/{fileName} {
-      allow read: if request.auth != null;
-      allow write: if isAdminOrInstructor();
-    }
-    
-    // Public resources
-    match /public/{fileName} {
-      allow read: if true;
-      allow write: if isAdminOrInstructor();
-    }
-    
-    // User-generated content (notes, bookmarks)
-    match /user-content/{userId}/{fileName} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-    }
-    
-    // Test resources
-    match /test-resources/{fileName} {
-      allow read: if request.auth != null;
-      allow write: if isAdminOrInstructor();
-    }
-    
-    function isAdminOrInstructor() {
-      return request.auth != null && 
-             firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role in ['admin', 'instructor'];
+    match /{allPaths=**} {
+      allow read, write: if false;
     }
   }
 }

@@ -1,15 +1,36 @@
-import { useState } from 'react';
-import { NavLink, Link } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
+import { NavLink, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import ThemeToggle from './ThemeToggle';
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [isAccountOpen, setIsAccountOpen] = useState(false);
   const { currentUser, userProfile, logout, isAdmin } = useAuth();
+  const location = useLocation();
+  const drawerMountedRef = useRef(false);
+  const [drawerMounted, setDrawerMounted] = useState(false);
+  const closeBtnRef = useRef(null);
+
+  const openDrawer = () => {
+    setDrawerMounted(true);
+    // allow next paint for transition
+    requestAnimationFrame(() => setIsMobileMenuOpen(true));
+  };
+
+  const closeDrawer = () => {
+    setIsMobileMenuOpen(false);
+    // unmount after transition
+    setTimeout(() => setDrawerMounted(false), 250);
+  };
 
   const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
+    if (drawerMounted || isMobileMenuOpen) {
+      closeDrawer();
+    } else {
+      openDrawer();
+    }
   };
 
   const navItems = [
@@ -17,35 +38,91 @@ const Header = () => {
     { name: 'Courses', to: '/courses' },
     { name: 'Practice', to: '/practice' },
     { name: 'Tests', to: '/tests' },
+    { name: 'About', to: '/about' },
   ];
 
+  // Lock body scroll when the drawer is mounted
+  useEffect(() => {
+    if (drawerMounted) {
+      const original = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = original;
+      };
+    }
+  }, [drawerMounted]);
+
+  // Auto-collapse on route change
+  useEffect(() => {
+    if (drawerMounted || isMobileMenuOpen) {
+      closeDrawer();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.pathname]);
+
+  // Basic focus trap when drawer is mounted
+  useEffect(() => {
+    if (!drawerMounted) return;
+    // focus the close button
+    setTimeout(() => closeBtnRef.current?.focus(), 0);
+    const drawer = document.getElementById('mobile-drawer');
+    if (!drawer) return;
+    const getFocusable = () => drawer.querySelectorAll(
+      'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    );
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        closeDrawer();
+      } else if (e.key === 'Tab') {
+        const items = getFocusable();
+        if (!items.length) return;
+        const first = items[0];
+        const last = items[items.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
+    drawer.addEventListener('keydown', onKeyDown);
+    return () => drawer.removeEventListener('keydown', onKeyDown);
+  }, [drawerMounted]);
+
   return (
-    <header className="sticky top-0 z-50 glass border-b border-white/20 dark:border-white/10 animate-fade-in-down">
+    <header className="sticky top-0 z-50 backdrop-blur-md bg-white/70 dark:bg-dark-primary/60 border-b border-white/20 dark:border-white/10 supports-[backdrop-filter]:bg-white/60 supports-[backdrop-filter]:dark:bg-dark-primary/50 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex items-center">
             <Link to="/" className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-accent-500 to-accent-600 rounded-lg flex items-center justify-center animate-glow">
-                <span className="text-white font-bold text-sm">A</span>
-              </div>
+              <img
+                src="/logo-1.png"
+                alt="Aptiprep Logo"
+                className="w-8 h-8 rounded-lg object-cover"
+                loading="eager"
+                decoding="async"
+              />
               <span className="text-xl font-bold text-primary-900 dark:text-dark-text-primary">
-                Aptiprep
+                APTIPREP
               </span>
             </Link>
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-1">
+          <nav className="hidden md:flex items-center gap-2">
             {navItems.map((item) => (
               <NavLink
                 key={item.name}
                 to={item.to}
                 className={({ isActive }) => `
-                  px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200
+                  px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200
                   ${isActive
-                    ? 'bg-accent-100 text-accent-700 dark:bg-accent-900/30 dark:text-accent-300'
-                    : 'text-primary-600 hover:text-primary-900 hover:bg-primary-100 dark:text-dark-text-secondary dark:hover:text-dark-text-primary dark:hover:bg-dark-secondary'}
+                    ? 'bg-accent-100 text-accent-700 dark:bg-accent-900/30 dark:text-accent-200'
+                    : 'text-primary-700 hover:text-primary-900 hover:bg-primary-100 dark:text-dark-text-secondary dark:hover:text-white/90 dark:hover:bg-white/10'}
                 `}
               >
                 {item.name}
@@ -125,12 +202,12 @@ const Header = () => {
             )}
           </div>
 
-          {/* Mobile menu button */}
+          {/* Mobile actions */}
           <div className="md:hidden flex items-center space-x-2">
             <ThemeToggle />
             <button
               onClick={toggleMobileMenu}
-              className="inline-flex items-center justify-center p-2 rounded-md text-primary-600 dark:text-dark-text-secondary hover:text-primary-900 dark:hover:text-dark-text-primary hover:bg-primary-100 dark:hover:bg-dark-secondary focus:outline-none focus:ring-2 focus:ring-accent-500"
+              className="inline-flex items-center justify-center p-2 rounded-lg border border-primary-200 dark:border-dark-border text-primary-700 dark:text-white hover:bg-primary-100/60 dark:hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-accent-500"
               aria-expanded="false"
             >
               <span className="sr-only">Open main menu</span>
@@ -159,97 +236,136 @@ const Header = () => {
         </div>
       </div>
 
-      {/* Mobile menu */}
-      <div className={`md:hidden ${isMobileMenuOpen ? 'block' : 'hidden'}`}>
-        <div className="px-2 pt-2 pb-3 space-y-1 bg-white dark:bg-dark-primary border-t border-primary-200 dark:border-dark-border">
-          {navItems.map((item) => (
-            <NavLink
-              key={item.name}
-              to={item.to}
-              onClick={() => setIsMobileMenuOpen(false)}
-              className={({ isActive }) => `
-                block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200
-                ${isActive
-                  ? 'bg-accent-100 text-accent-700 dark:bg-accent-900/30 dark:text-accent-300'
-                  : 'text-primary-600 hover:text-primary-900 hover:bg-primary-100 dark:text-dark-text-secondary dark:hover:text-dark-text-primary dark:hover:bg-dark-secondary'}
-              `}
-            >
-              {item.name}
-            </NavLink>
-          ))}
-          <div className="pt-4 pb-3 border-t border-primary-200 dark:border-dark-border">
-            {currentUser ? (
-              <div className="px-3 space-y-3">
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                    <span className="text-white text-sm font-medium">
-                      {userProfile?.displayName?.charAt(0) || currentUser.email?.charAt(0) || 'U'}
-                    </span>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                      {userProfile?.displayName || 'User'}
-                    </p>
-                    <Link to="/courses" className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-3 py-2 rounded-md text-sm font-medium" onClick={() => setIsMobileMenuOpen(false)}>
-                      Courses
-                    </Link>
-                    <Link to="/learning" className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-3 py-2 rounded-md text-sm font-medium" onClick={() => setIsMobileMenuOpen(false)}>
-                      Learning
-                    </Link>
-                    <Link to="/practice" className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-3 py-2 rounded-md text-sm font-medium" onClick={() => setIsMobileMenuOpen(false)}>
-                      Practice
-                    </Link>
-                    <Link to="/tests" className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-3 py-2 rounded-md text-sm font-medium" onClick={() => setIsMobileMenuOpen(false)}>
-                      Tests
-                    </Link>
-                  </div>
-                  <Link
-                    to="/dashboard"
-                    className="block px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Dashboard
-                  </Link>
-                  <Link
-                    to="/analytics"
-                    className="block px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Analytics
-                  </Link>
-                  {isAdmin() && (
-                    <Link
-                      to="/admin/dashboard"
-                      className="block px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      Admin Dashboard
-                    </Link>
-                  )}
+      {/* Mobile overlay & drawer */}
+      {drawerMounted && (
+        <div className="md:hidden">
+          {/* Overlay */}
+          <div
+            className={`fixed inset-0 z-[9998] transition-opacity duration-200 ${isMobileMenuOpen ? 'opacity-100' : 'opacity-0'} bg-black/70 backdrop-blur-sm`}
+            onClick={closeDrawer}
+          />
+          {/* Drawer */}
+          <div
+            id="mobile-drawer"
+            className={`fixed right-0 top-[10vh] h-[80vh] w-[80vw] z-[9999] bg-white dark:bg-dark-primary rounded-l-2xl shadow-2xl flex flex-col overflow-hidden transform transition-transform duration-200 ease-out ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Mobile navigation"
+          >
+            <div className="flex items-center justify-between px-4 py-3 border-b border-primary-200 dark:border-dark-border">
+              <Link to="/" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center space-x-2">
+                <img src="/logo-1.png" alt="Aptiprep Logo" className="w-8 h-8 rounded-lg object-cover" />
+                <span className="text-lg font-bold text-primary-900 dark:text-white">APTIPREP</span>
+              </Link>
+              <div className="flex items-center gap-2">
+                <ThemeToggle />
+                <button
+                  ref={closeBtnRef}
+                  onClick={closeDrawer}
+                  className="inline-flex items-center justify-center p-2 rounded-lg border border-primary-200 dark:border-dark-border text-primary-700 dark:text-white hover:bg-primary-100/60 dark:hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-accent-500"
+                  aria-label="Close menu"
+                >
+                  <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div className="px-4 py-4 space-y-1 overflow-y-auto">
+              {navItems.map((item) => (
+                <NavLink
+                  key={item.name}
+                  to={item.to}
+                  onClick={closeDrawer}
+                  className={({ isActive }) => `
+                    block px-3 py-3 rounded-lg text-base font-medium transition-colors duration-200
+                    ${isActive
+                      ? 'bg-accent-100 text-accent-700 dark:bg-accent-900/30 dark:text-accent-200'
+                      : 'text-primary-700 hover:text-primary-900 hover:bg-primary-100 dark:text-dark-text-secondary dark:hover:text-white/90 dark:hover:bg-white/10'}
+                  `}
+                >
+                  {item.name}
+                </NavLink>
+              ))}
+            </div>
+
+            <div className="mt-2 border-t border-primary-200 dark:border-dark-border px-2 py-2 overflow-y-auto">
+              {currentUser ? (
+                <div className="">
+                  {/* Account header (toggle) */}
                   <button
-                    onClick={() => {
-                      logout();
-                      setIsMobileMenuOpen(false);
-                    }}
-                    className="block w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                    className="w-full px-2 py-3 flex items-center gap-3 rounded-lg hover:bg-primary-100 dark:hover:bg-white/10"
+                    onClick={() => setIsAccountOpen((v) => !v)}
+                    aria-expanded={isAccountOpen}
+                    aria-controls="mobile-account-section"
                   >
-                    Sign out
+                    <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                      {userProfile?.displayName?.charAt(0) || currentUser.email?.charAt(0) || 'U'}
+                    </div>
+                    <div className="flex-1 text-left">
+                      <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                        {userProfile?.displayName || 'User'}
+                      </p>
+                      <p className="text-xs text-primary-500 dark:text-dark-text-secondary">Account</p>
+                    </div>
+                    <svg className={`h-5 w-5 transition-transform ${isAccountOpen ? 'rotate-180' : ''}`} viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 011.08 1.04l-4.25 4.25a.75.75 0 01-1.06 0L5.25 8.27a.75.75 0 01-.02-1.06z" clipRule="evenodd" />
+                    </svg>
                   </button>
+
+                  {/* Collapsible content */}
+                  {isAccountOpen && (
+                    <div id="mobile-account-section" className="mt-2 grid grid-cols-2 gap-2 px-2 pb-2">
+                      <Link
+                        to="/dashboard"
+                        className="block px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                        onClick={closeDrawer}
+                      >
+                        Dashboard
+                      </Link>
+                      <Link
+                        to="/analytics"
+                        className="block px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                        onClick={closeDrawer}
+                      >
+                        Analytics
+                      </Link>
+                      {isAdmin() && (
+                        <Link
+                          to="/admin/dashboard"
+                          className="block px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded col-span-2"
+                          onClick={closeDrawer}
+                        >
+                          Admin Dashboard
+                        </Link>
+                      )}
+                      <button
+                        onClick={() => {
+                          logout();
+                          closeDrawer();
+                        }}
+                        className="block w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded col-span-2"
+                      >
+                        Sign out
+                      </button>
+                    </div>
+                  )}
                 </div>
-              </div>
-            ) : (
-              <div className="flex items-center px-3 space-x-3">
-                <Link to="/login" className="btn-outline btn-sm flex-1">
-                  Login
-                </Link>
-                <Link to="/signup" className="btn-primary btn-sm flex-1">
-                  Get Started
-                </Link>
-              </div>
-            )}
+              ) : (
+                <div className="flex items-center gap-2 px-2 pb-4">
+                  <Link to="/login" className="btn-outline btn-sm flex-1">
+                    Login
+                  </Link>
+                  <Link to="/signup" className="btn-primary btn-sm flex-1">
+                    Get Started
+                  </Link>
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </header>
   );
 };

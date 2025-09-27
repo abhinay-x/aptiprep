@@ -1,6 +1,5 @@
 module.exports = {
   env: {
-    browser: true,
     es6: true,
     node: true,
   },
@@ -14,13 +13,7 @@ module.exports = {
   rules: {
     "no-restricted-globals": ["error", "name", "length"],
     "prefer-arrow-callback": "error",
-    "quotes": ["error", "single", {"allowTemplateLiterals": true}],
-    "max-len": ["error", {"code": 120}],
-    "object-curly-spacing": ["error", "always"],
-    "comma-dangle": ["error", "never"],
-    "no-console": "off",
-    "require-jsdoc": "off",
-    "valid-jsdoc": "off"
+    "quotes": ["error", "double", {"allowTemplateLiterals": true}],
   },
   overrides: [
     {

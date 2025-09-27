@@ -45,12 +45,11 @@ const Footer = () => {
   ];
 
   const socialLinks = [
-    { name: 'Facebook', icon: '📘', href: '#', color: 'hover:text-blue-500' },
-    { name: 'Twitter', icon: '🐦', href: '#', color: 'hover:text-blue-400' },
-    { name: 'Instagram', icon: '📷', href: '#', color: 'hover:text-pink-500' },
-    { name: 'LinkedIn', icon: '💼', href: '#', color: 'hover:text-blue-600' },
-    { name: 'YouTube', icon: '📺', href: '#', color: 'hover:text-red-500' },
-    { name: 'Telegram', icon: '✈️', href: '#', color: 'hover:text-blue-500' }
+    { name: 'LinkedIn', href: '#', iconSrc: '/icons/li.svg' },
+    { name: 'Instagram', href: '#', iconSrc: '/icons/instagram.svg' },
+    { name: 'X', href: '#', iconSrc: '/icons/x.svg' },
+    { name: 'YouTube', href: '#', iconSrc: '/icons/youtube.svg' },
+    { name: 'Telegram', href: '#', iconSrc: '/icons/telegram.svg' }
   ];
 
   return (
@@ -63,10 +62,14 @@ const Footer = () => {
           <div className="lg:col-span-2">
             {/* Logo */}
             <div className="flex items-center space-x-2 mb-4 sm:mb-6">
-              <div className="w-10 h-10 bg-gradient-to-br from-vibrant-orange-500 to-vibrant-purple-500 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">A</span>
-              </div>
-              <span className="text-2xl font-bold">Aptiprep</span>
+              <img
+                src="/logo-1.png"
+                alt="Aptiprep Logo"
+                className="w-10 h-10 rounded-lg object-cover"
+                loading="eager"
+                decoding="async"
+              />
+              <span className="text-2xl font-bold">APTIPREP</span>
             </div>
 
             {/* Description */}
@@ -77,21 +80,37 @@ const Footer = () => {
             {/* App Download Buttons */}
             <div className="space-y-2 sm:space-y-3">
               <h4 className="font-semibold text-white mb-2 sm:mb-3">Download Our App</h4>
-              <div className="flex flex-col xs:flex-row space-y-2 xs:space-y-0 xs:space-x-3">
-                <button className="flex items-center space-x-2 bg-black hover:bg-gray-800 px-4 py-2 rounded-lg transition-colors">
-                  <span className="text-2xl">📱</span>
-                  <div className="text-left">
-                    <div className="text-xs text-gray-300">Download on the</div>
-                    <div className="text-sm font-semibold">App Store</div>
-                  </div>
-                </button>
-                <button className="flex items-center space-x-2 bg-black hover:bg-gray-800 px-4 py-2 rounded-lg transition-colors">
-                  <span className="text-2xl">🤖</span>
-                  <div className="text-left">
-                    <div className="text-xs text-gray-300">Get it on</div>
-                    <div className="text-sm font-semibold">Google Play</div>
-                  </div>
-                </button>
+              <div className="flex flex-col xs:flex-row items-center xs:items-start justify-center xs:justify-start space-y-2 xs:space-y-0 xs:space-x-3">
+                <a
+                  href="/coming-soon"
+                  className="inline-flex h-14 w-48 items-center justify-center"
+                  aria-label="Download on the App Store"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <img
+                    src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg"
+                    alt="Download on the App Store"
+                    className="w-full h-auto object-contain"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </a>
+                <a
+                  href="/coming-soon"
+                  className="inline-flex h-14 w-48 items-center justify-center"
+                  aria-label="Get it on Google Play"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <img
+                    src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png"
+                    alt="Get it on Google Play"
+                    className="w-full h-auto object-contain"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </a>
               </div>
             </div>
           </div>
@@ -183,11 +202,19 @@ const Footer = () => {
                   <a
                     key={index}
                     href={social.href}
-                    className={`text-primary-300 dark:text-dark-text-secondary ${social.color} transition-colors duration-200 text-lg`}
+                    className="transition-opacity duration-200 hover:opacity-80"
                     aria-label={social.name}
                     title={social.name}
+                    target="_blank"
+                    rel="noopener noreferrer"
                   >
-                    {social.icon}
+                    <img
+                      src={social.iconSrc}
+                      alt={social.name}
+                      className="h-5 w-5"
+                      loading="lazy"
+                      decoding="async"
+                    />
                   </a>
                 ))}
               </div>

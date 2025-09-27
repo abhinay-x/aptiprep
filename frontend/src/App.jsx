@@ -21,6 +21,8 @@ import Dashboard from './pages/Dashboard.jsx'
 import Analytics from './pages/Analytics.jsx'
 import Login from './pages/Login.jsx'
 import Signup from './pages/Signup.jsx'
+import About from './pages/About.jsx'
+import ComingSoon from './pages/ComingSoon.jsx'
 import AdminDashboard from './pages/AdminDashboard.jsx'
 import AdminLogin from './admin/AdminLogin.jsx'
 import AddContent from './admin/AddContent.jsx'
@@ -110,6 +112,12 @@ function App() {
               </ProtectedRoute>
             } />
             
+            {/* Public About page */}
+            <Route path="/about" element={<About />} />
+
+            {/* Public Coming Soon page */}
+            <Route path="/coming-soon" element={<ComingSoon />} />
+
             {/* Learning Content - accessible to all authenticated users */}
             <Route path="/learning" element={
               <ProtectedRoute>
