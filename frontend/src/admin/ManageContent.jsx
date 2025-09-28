@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import AdminLayout from './AdminLayout';
 import { collection, getDocs, doc, updateDoc, deleteDoc, query, where, orderBy, limit } from 'firebase/firestore';
 import { ref, deleteObject } from 'firebase/storage';
 import { db, storage } from '../config/firebase';
@@ -110,15 +111,18 @@ export default function ManageContent() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
+      <AdminLayout currentPage="videos">
+        <div className="flex items-center justify-center min-h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
+      </AdminLayout>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto p-6">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
+    <AdminLayout currentPage="videos">
+      <div className="max-w-7xl mx-auto p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
         <div className="p-6 border-b border-gray-200 dark:border-gray-700">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -282,6 +286,7 @@ export default function ManageContent() {
           )}
         </div>
       </div>
-    </div>
+      </div>
+    </AdminLayout>
   );
 }

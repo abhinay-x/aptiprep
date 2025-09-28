@@ -30,6 +30,7 @@ import ManageContent from './admin/ManageContent.jsx'
 import SetAdminRole from './admin/SetAdminRole.jsx'
 import LearningContent from './pages/LearningContent.jsx'
 import NotFound from './pages/NotFound.jsx'
+import { AdminAuthProvider } from './admin/AdminAuth.jsx'
 
 function App() {
   const location = useLocation();
@@ -125,8 +126,12 @@ function App() {
               </ProtectedRoute>
             } />
             
-            {/* Admin module: separate login and guarded dashboard */}
-            <Route path="/admin/login" element={<AdminLogin />} />
+            {/* Admin module: wrap in AdminAuthProvider */}
+            <Route path="/admin/login" element={
+              <AdminAuthProvider>
+                <AdminLogin />
+              </AdminAuthProvider>
+            } />
             <Route path="/admin/set-role" element={
               <ProtectedRoute>
                 <SetAdminRole />
@@ -135,20 +140,29 @@ function App() {
             <Route path="/Admin" element={<Navigate to="/admin/dashboard" replace />} />
             <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
             <Route path="/admin/dashboard" element={
-              <AdminOnlyRoute>
-                <AdminDashboard />
-              </AdminOnlyRoute>
+              <AdminAuthProvider>
+                <AdminOnlyRoute>
+                  <AdminDashboard />
+                </AdminOnlyRoute>
+              </AdminAuthProvider>
             } />
             <Route path="/admin/add-content" element={
-              <AdminOnlyRoute>
-                <AddContent />
-              </AdminOnlyRoute>
+              <AdminAuthProvider>
+                <AdminOnlyRoute>
+                  <AddContent />
+                </AdminOnlyRoute>
+              </AdminAuthProvider>
             } />
             <Route path="/admin/manage-content" element={
-              <AdminOnlyRoute>
-                <ManageContent />
-              </AdminOnlyRoute>
+              <AdminAuthProvider>
+                <AdminOnlyRoute>
+                  <ManageContent />
+                </AdminOnlyRoute>
+              </AdminAuthProvider>
             } />
+            
+            {/* Explicit NotFound route for disabled features */}
+            <Route path="/not-found" element={<NotFound />} />
             
             <Route path="*" element={<NotFound />} />
           </Routes>

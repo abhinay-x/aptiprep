@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import AdminLayout from './AdminLayout';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage, auth } from '../config/firebase';
@@ -167,25 +168,27 @@ export default function AddContent() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-          Add Learning Content
-        </h2>
+    <AdminLayout currentPage="videos">
+      <div className="max-w-4xl mx-auto p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+            Add Learning Content
+          </h2>
 
-        {success && (
-          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-            <p className="text-green-700">✅ Content added successfully!</p>
-          </div>
-        )}
+          {success && (
+            <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+              <p className="text-green-700">✅ Content added successfully!</p>
+            </div>
+          )}
 
-        {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-red-700">❌ {error}</p>
-          </div>
-        )}
+          {/* Error */}
+          {error && (
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-red-700">❌ {error}</p>
+            </div>
+          )}
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
           {/* Title */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -347,5 +350,6 @@ export default function AddContent() {
         </form>
       </div>
     </div>
+    </AdminLayout>
   );
 }

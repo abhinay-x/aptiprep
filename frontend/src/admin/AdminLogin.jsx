@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { auth } from '../config/firebase';
 import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
@@ -51,6 +51,13 @@ export default function AdminLogin() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-dark-primary p-4">
       <div className="w-full max-w-md bg-white dark:bg-dark-card rounded-xl shadow p-6">
+        <div className="flex items-center justify-between mb-4">
+          <Link to="/" className="inline-flex items-center gap-2">
+            <img src="/logo-1.png" alt="Aptiprep Logo" className="w-8 h-8 rounded-lg object-cover" />
+            <span className="font-bold text-gray-900 dark:text-white">APTIPREP</span>
+          </Link>
+          <button onClick={() => navigate(-1)} className="btn-outline btn-sm">← Back</button>
+        </div>
         <h1 className="text-2xl font-bold mb-1 text-gray-900 dark:text-white">Admin Login</h1>
         <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">Sign in to manage the platform</p>
         {error && (
