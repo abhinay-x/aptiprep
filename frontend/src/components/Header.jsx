@@ -41,15 +41,35 @@ const Header = () => {
     { name: 'About', to: '/about' },
   ];
 
-  // Lock body scroll when the drawer is mounted
+  // Lock body scroll when the drawer is mounted (mobile) without causing layout shift
   useEffect(() => {
-    if (drawerMounted) {
-      const original = document.body.style.overflow;
-      document.body.style.overflow = 'hidden';
-      return () => {
-        document.body.style.overflow = original;
-      };
-    }
+    if (!drawerMounted) return;
+    const { body, documentElement: html } = document;
+    const prev = {
+      bodyOverflow: body.style.overflow,
+      bodyPosition: body.style.position,
+      bodyTop: body.style.top,
+      bodyWidth: body.style.width,
+      htmlOverflowX: html.style.overflowX,
+    };
+    const scrollY = window.scrollY || window.pageYOffset || 0;
+    // Prevent vertical & horizontal scroll and layout width jumps
+    html.style.overflowX = 'hidden';
+    body.style.overflow = 'hidden';
+    body.style.position = 'fixed';
+    body.style.top = `-${scrollY}px`;
+    body.style.width = '100%';
+
+    return () => {
+      // Restore styles
+      body.style.overflow = prev.bodyOverflow;
+      body.style.position = prev.bodyPosition;
+      body.style.top = prev.bodyTop;
+      body.style.width = prev.bodyWidth;
+      html.style.overflowX = prev.htmlOverflowX;
+      // Restore scroll position
+      window.scrollTo(0, scrollY);
+    };
   }, [drawerMounted]);
 
   // Auto-collapse on route change
@@ -59,6 +79,17 @@ const Header = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
+
+  // Auto-close drawer when resizing to desktop breakpoint to avoid stuck states
+  useEffect(() => {
+    const onResize = () => {
+      if (window.innerWidth >= 768 && (drawerMounted || isMobileMenuOpen)) {
+        closeDrawer();
+      }
+    };
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, [drawerMounted, isMobileMenuOpen]);
 
   // Basic focus trap when drawer is mounted
   useEffect(() => {
@@ -208,7 +239,8 @@ const Header = () => {
             <button
               onClick={toggleMobileMenu}
               className="inline-flex items-center justify-center p-2 rounded-lg border border-primary-200 dark:border-dark-border text-primary-700 dark:text-white hover:bg-primary-100/60 dark:hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-accent-500"
-              aria-expanded="false"
+              aria-expanded={isMobileMenuOpen}
+              aria-controls="mobile-drawer"
             >
               <span className="sr-only">Open main menu</span>
               {/* Hamburger icon */}
@@ -247,7 +279,7 @@ const Header = () => {
           {/* Drawer */}
           <div
             id="mobile-drawer"
-            className={`fixed right-0 top-[10vh] h-[80vh] w-[80vw] z-[9999] bg-white dark:bg-dark-primary rounded-l-2xl shadow-2xl flex flex-col overflow-hidden transform transition-transform duration-200 ease-out ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}
+            className={`fixed right-0 top-0 h-screen w-full max-w-sm z-[9999] bg-white dark:bg-dark-primary rounded-l-2xl shadow-2xl flex flex-col overflow-hidden transform transition-transform duration-200 ease-out ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}
             role="dialog"
             aria-modal="true"
             aria-label="Mobile navigation"
