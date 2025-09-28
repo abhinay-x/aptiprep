@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 
 export default function YouTubeCustomPlayer({ videoId, title, className = '' }) {
   const iframeRef = useRef(null);
+  const [iframeId] = useState(() => `yt-player-${Math.random().toString(36).slice(2)}`);
   const [isReady, setIsReady] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
@@ -17,6 +18,20 @@ export default function YouTubeCustomPlayer({ videoId, title, className = '' }) 
       const win = iframeRef.current?.contentWindow;
       if (!win) return;
       win.postMessage(JSON.stringify({ event: 'command', func, args }), '*');
+    } catch (_) {}
+  };
+
+  // Send the initial 'listening' event and register event listeners per YouTube's protocol
+  const initYouTubeBridge = () => {
+    try {
+      const win = iframeRef.current?.contentWindow;
+      if (!win) return;
+      // Announce we are listening
+      win.postMessage(JSON.stringify({ event: 'listening', id: iframeId }), '*');
+      // Ask YouTube to send events
+      ['onReady', 'onStateChange', 'onPlaybackQualityChange', 'onPlaybackRateChange', 'onError'].forEach(evt => {
+        win.postMessage(JSON.stringify({ event: 'command', func: 'addEventListener', args: [evt] }), '*');
+      });
     } catch (_) {}
   };
 
@@ -68,6 +83,11 @@ export default function YouTubeCustomPlayer({ videoId, title, className = '' }) 
     return () => clearInterval(id);
   }, [isReady]);
 
+  // Initialize bridge after iframe loads (ensures contentWindow is available)
+  const handleIframeLoad = () => {
+    initYouTubeBridge();
+  };
+
   const togglePlay = () => {
     if (!isReady) return;
     if (isPlaying) post('pauseVideo'); else post('playVideo');
@@ -108,12 +128,14 @@ export default function YouTubeCustomPlayer({ videoId, title, className = '' }) 
     <div className={`relative bg-black rounded-lg overflow-hidden group ${className}`}>
       <iframe
         ref={iframeRef}
+        id={iframeId}
         src={embedUrl}
         title={title}
         className="w-full aspect-video"
         frameBorder="0"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
         allowFullScreen
+        onLoad={handleIframeLoad}
       />
 
       {/* Overlay controls (custom). Note: YouTube logo may still appear; cannot be fully removed per YouTube policies. */}

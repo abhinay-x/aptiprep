@@ -3,6 +3,7 @@ import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { Link } from 'react-router-dom';
 import CustomVideoPlayer from '../components/CustomVideoPlayer';
+import YouTubeCustomPlayer from '../components/YouTubeCustomPlayer';
 
 export default function Courses() {
   const [content, setContent] = useState([]);
@@ -161,7 +162,7 @@ export default function Courses() {
 
               return (
                 <div key={item.id} className="bg-white dark:bg-dark-card rounded-lg border border-primary-200 dark:border-dark-border overflow-hidden hover:shadow-lg transition-shadow">
-                  {/* Content Preview - Only play uploaded MP4s; show static thumbnail for YouTube */}
+                  {/* Content Preview - Play uploaded MP4s or YouTube inline */}
                   {item.fileUrl && item.fileType?.startsWith('video/') ? (
                     <CustomVideoPlayer
                       src={item.fileUrl}
@@ -169,18 +170,11 @@ export default function Courses() {
                       className="w-full"
                     />
                   ) : videoId ? (
-                    <div className="relative h-48 bg-black overflow-hidden">
-                      <img
-                        src={`https://img.youtube.com/vi/${videoId}/hqdefault.jpg`}
-                        alt={item.title}
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute top-3 left-3">
-                        <span className="px-2 py-1 bg-amber-600 text-white rounded-full text-xs font-medium">
-                          YouTube link — upload MP4 for in-app playback
-                        </span>
-                      </div>
-                    </div>
+                    <YouTubeCustomPlayer
+                      videoId={videoId}
+                      title={item.title}
+                      className="w-full"
+                    />
                   ) : (
                     <div className="relative h-48 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900 dark:to-purple-900 flex items-center justify-center">
                       <span className="text-6xl">{getContentIcon(item.contentType)}</span>

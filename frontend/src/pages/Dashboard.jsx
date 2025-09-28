@@ -5,6 +5,7 @@ import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { Link } from 'react-router-dom';
 import CustomVideoPlayer from '../components/CustomVideoPlayer';
+import YouTubeCustomPlayer from '../components/YouTubeCustomPlayer';
 
 export default function Dashboard() {
   const { currentUser, userProfile } = useAuth();
@@ -226,7 +227,7 @@ export default function Dashboard() {
                     
                     return (
                       <div key={item.id} className="border border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
-                        {/* Content Preview - Only play uploaded MP4s; show static thumbnail for YouTube */}
+                        {/* Content Preview - Play uploaded MP4s or YouTube inline */}
                         {item.fileUrl && item.fileType?.startsWith('video/') ? (
                           <CustomVideoPlayer
                             src={item.fileUrl}
@@ -234,13 +235,11 @@ export default function Dashboard() {
                             className="w-full aspect-video"
                           />
                         ) : videoId ? (
-                          <div className="aspect-video bg-black overflow-hidden">
-                            <img
-                              src={`https://img.youtube.com/vi/${videoId}/hqdefault.jpg`}
-                              alt={item.title}
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
+                          <YouTubeCustomPlayer
+                            videoId={videoId}
+                            title={item.title}
+                            className="w-full"
+                          />
                         ) : (
                           <div className="aspect-video bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900 dark:to-purple-900 flex items-center justify-center">
                             <div className="text-4xl">{getContentIcon(item.contentType)}</div>
