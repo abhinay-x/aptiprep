@@ -14,15 +14,15 @@ const team = [
     },
   },
   {
-    name: 'Teammate Name',
+    name: 'R.Abhinay Chary',
     role: 'Full Stack developer',
     avatar: null,
     bio:
-      'Passionate about building scalable web apps, DX, and clean UI. Focused on React, Firebase, and serverless.',
+      ' Hi, I’m Raghipani Abhinay Chary — a Software Engineer passionate about building scalable, production-grade solutions. With hands-on expertise in full-stack development (MERN), DevOps, and cloud-native systems, I’ve developed applications serving 500+ active users, optimized performance using advanced DSA implementations, and deployed solutions with CI/CD pipelines and Docker. Certified in Java, Python, DevOps, and Azure, I enjoy solving complex problems, mentoring peers, and driving innovation through technology.',
     links: {
-      linkedin: '#',
-      github: '#',
-      email: 'mailto:teammate@example.com',
+      linkedin: 'https://linkedin.com/in/abhinay-chary',
+      github: 'https://github.com/abhinay-x',
+      email: 'mailto:r.abhinaychary@gmail.com',
     },
   },
 ]
