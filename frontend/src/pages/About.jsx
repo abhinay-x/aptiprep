@@ -95,9 +95,13 @@ export default function About() {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="LinkedIn"
-                    className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-primary-50 dark:bg-primary-900/30 hover:bg-primary-100 dark:hover:bg-primary-900/50 transition-colors"
+                    className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-primary-50 dark:bg-primary-900/30 hover:bg-primary-100 dark:hover:bg-primary-900/50 transition-colors text-[#0A66C2]"
+                    title="LinkedIn"
                   >
-                    <img src="/icons/li.svg" alt="LinkedIn" className="w-5 h-5" />
+                    {/* LinkedIn icon inline so it inherits currentColor */}
+                    <svg viewBox="0 0 24 24" className="w-5 h-5" fill="currentColor" aria-hidden="true">
+                      <path d="M20.447 20.452H17.21v-5.569c0-1.329-.027-3.039-1.852-3.039-1.853 0-2.136 1.447-2.136 2.942v5.666H9.085V9h3.105v1.561h.045c.433-.82 1.492-1.686 3.07-1.686 3.285 0 3.89 2.161 3.89 4.972v6.605zM5.337 7.433a1.802 1.802 0 1 1 0-3.604 1.802 1.802 0 0 1 0 3.604zM6.997 20.452H3.675V9h3.322v11.452zM21.75 0H2.25C1.008 0 0 1.008 0 2.25v19.5C0 22.992 1.008 24 2.25 24h19.5c1.242 0 2.25-1.008 2.25-2.25V2.25C24 1.008 22.992 0 21.75 0z"/>
+                    </svg>
                   </a>
                 )}
                 {member.links.github && (
