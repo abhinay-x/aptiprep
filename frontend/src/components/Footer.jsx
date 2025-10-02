@@ -46,9 +46,9 @@ const Footer = () => {
 
   const socialLinks = [
     { name: 'LinkedIn', href: '#', iconSrc: '/icons/li.svg' },
-    { name: 'Instagram', href: '#', iconSrc: '/icons/instagram.svg' },
+    { name: 'Instagram', href: 'https://www.instagram.com/aptiprep?igsh=bXlydDhpYXgyMWV1', iconSrc: '/icons/instagram.svg' },
     { name: 'X', href: '#', iconSrc: '/icons/x.svg' },
-    { name: 'YouTube', href: '#', iconSrc: '/icons/youtube.svg' },
+    { name: 'YouTube', href: 'https://youtube.com/@aptiprep?si=cuqAgPT7MUO6CvjL', iconSrc: '/icons/youtube.svg' },
     { name: 'Telegram', href: '#', iconSrc: '/icons/telegram.svg' }
   ];
 
